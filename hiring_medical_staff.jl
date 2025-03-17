@@ -81,6 +81,7 @@ for i=1:m
 	E_N=rand(d,n)
 	E_M=rand(d,n)
 
+
 	S=[if x>0 1 else -1 end for x in E_S]
 	Np=thetaSNp*S.+E_Np
 	Mp=thetaSMp*S.+E_Mp
@@ -88,11 +89,30 @@ for i=1:m
 	N=thetaNpN*Np.+E_N
 
 
+	#subset data based on observed policy
+	
+	indicator=min.((rand(Uniform(),n).<0.1) .+ (rand(Uniform(),n) .< cdf.(Normal(),Np+Mp)),1)
+	S=S[indicator.==1]
+	Np=Np[indicator.==1]
+	Mp=Mp[indicator.==1]
+	M=M[indicator.==1]
+	N=N[indicator.==1]
 
-	X=hcat(repeat([1],outer=n),Mp)
+
+	# use rejection sampling
+	uni=rand(Uniform(),sum(indicator))
+	rejection_sample=uni.< (1 ./ (10 .* (1 .- 0.9 .* (1 .- cdf.(Normal(),Np+Mp)))))
+
+	S=S[rejection_sample.==1]
+	Np=Np[rejection_sample.==1]
+	Mp=Mp[rejection_sample.==1]
+	M=M[rejection_sample.==1]
+	N=N[rejection_sample.==1]
+
+	X=hcat(repeat([1],outer=sum(rejection_sample)),Mp)
 	M_Mp=inv(X'*X)*X'
 
-	X=hcat(repeat([1],outer=n),S,Mp)
+	X=hcat(repeat([1],outer=sum(rejection_sample)),S,Mp)
 	M_SMp=inv(X'*X)*X'
 
 	models=Dict("M_SMp"=>M_SMp,"M_Mp"=>M_Mp)
@@ -108,7 +128,7 @@ end
 
 Random.seed!(1)
 
-est1=estimate_appropriate(1,2,3,4,5,6,10000,100)
+est1=estimate_appropriate(1,2,3,4,5,6,10000,1000)
 
 est1=[[x[j] for x in est1] for j=1:3]
 
@@ -129,7 +149,7 @@ quantile(d1.w3,[0.05,0.95])
 
 
 
-est2=estimate_appropriate(6,5,4,3,2,1,10000,100)
+est2=estimate_appropriate(6,5,4,3,2,1,10000,1000)
 
 est2=[[x[j] for x in est2] for j=1:3]
 

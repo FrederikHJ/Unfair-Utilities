@@ -96,7 +96,7 @@ v4=sum((val.Y)[pred .+ w1.*val.S .>= threshold])
 ## minority admitted under modified utility
 v5=sum((pred .+ w1.*val.S .>= threshold) .* (val.S.==0))
 
-## minority attainment under original utility
+## minority attainment under modified utility
 v6=sum((val.Y)[(pred .+ w1.*val.S .>= threshold) .* (val.S.==0)])
 
 return (minimum,w1,v1,v2,v3,v4,v5,v6)
@@ -117,16 +117,14 @@ mean([f[i][3]-f[i][6] for i=1:length(f)])
 quantile(([f[i][3]-f[i][6] for i=1:length(f)]),0.05)
 quantile(([f[i][3]-f[i][6] for i=1:length(f)]),0.95)
 
-
 #average number more addmitted from minority group
 mean([f[i][7]-f[i][4] for i=1:length(f)])
 quantile(([f[i][7]-f[i][4] for i=1:length(f)]),0.05)
 quantile(([f[i][7]-f[i][4] for i=1:length(f)]),0.95)
-
 #average number more graduating from minority group
 mean([f[i][8]-f[i][5] for i=1:length(f)])
 quantile(([f[i][8]-f[i][5] for i=1:length(f)]),0.05)
 quantile(([f[i][8]-f[i][5] for i=1:length(f)]),0.95)
 
-
+#The numbers in table 3 comes from f[1]
 
